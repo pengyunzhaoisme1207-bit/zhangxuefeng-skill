@@ -39,6 +39,12 @@ changelog: |
   - 新增附录：调研来源与引用触发规则
   - 保持 v2.0 的 5 引擎系统架构 + 31省数据层
   
+  v2.5 (2026-06-22): 数据层打通 Obsidian 数据库
+  - 新增 scripts/query.py — 31省录取数据查询脚本
+  - 打通 Obsidian K12 资料库 _database/（1191 xlsx + 374 docx + 272 pdf）
+  - 支持按省份、院校、位次范围、年份精准查询
+  - 查询结果以 Markdown 表格输出，可直接用于报告
+  
   v2.0 (2026-06-20): 升级为高考志愿填报专家系统
   - 新增 5 个分析引擎 (intake/score/risk/major/policy)
   - 新增数据层 (data/policies/)
@@ -277,7 +283,31 @@ changelog: |
 | 各省分数线/位次/一分一段 | 数据库 | `data/policies/`, `data/scores/` |
 | 2026新数据如何导入 | 数据更新工具 | `tools/data_updater.md` |
 
-#### 2D. 研究输出格式
+#### 2D. 直接查询本地数据库（v2.5，优先使用）
+
+**在搜索网络数据之前，先查询本地数据库。**
+
+本地数据库位于 `观察析 K12 资料库/50-高考志愿填报/_database/`，包含 2022-2025 年 31 省完整录取数据。
+
+使用查询脚本（无需自行搜索，秒返回）：
+
+```bash
+# 查询某校录取分数
+python3 SKILL_HOME/scripts/query.py --province 浙江 --mode school --school "杭州电子科技大学"
+
+# 按位次范围筛选
+python3 SKILL_HOME/scripts/query.py --province 广东 --mode school --rank-below 85000 --rank-above 12000
+
+# 列出可用省份
+python3 SKILL_HOME/scripts/query.py --list-provinces
+```
+
+**数据覆盖**：1191 个 xlsx（院校投档线/专业分数线/一分一段/招生计划）+ 374 docx + 272 pdf
+**数据来源标注**：查询结果自带「数据来源：XX.xlsx」，可直接引用到回答中
+
+> 当查询结果覆盖了所需数据时，**跳过 WebSearch**，直接用真实数据回答。
+
+#### 2E. 研究输出格式
 研究完成后，先在内部整理事实摘要（不输出给用户），然后进入Step 3。
 用户看到的不是调研报告，而是张雪峰基于真实数据做出的直接判断——但**每个关键数据必须带来源标注**。
 
@@ -771,6 +801,8 @@ zhangxuefeng-skill/
 │   └── yifenyiduan/                      # 一分一段表
 ├── tools/                                # 工具
 │   └── data_updater.md                   # 2026数据更新流程
+├── scripts/                               # 数据库查询（v2.5新增）
+│   └── query.py                           # 31省录取数据查询脚本
 ├── references/
 │   └── research/                         # 6个调研文件
 │       ├── 01-writings.md
